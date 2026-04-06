@@ -26,7 +26,7 @@ const server = http.createServer(app);
 // Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: true || 'http://localhost:5173',
+    origin: ["https://getdropflow.lovable.app", "https://lovable.dev"] || 'http://localhost:5173',
     methods: ['GET', 'POST'],
     credentials: true,
   },
@@ -38,7 +38,7 @@ app.set('io', io);
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: true || 'http://localhost:5173',
+  origin: ["https://getdropflow.lovable.app", "https://lovable.dev"] || 'http://localhost:5173',
   credentials: true,
 }));
 app.use(morgan('combined'));
