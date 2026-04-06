@@ -37,10 +37,7 @@ app.set('io', io);
 
 // Middleware
 app.use(helmet());
-app.use(cors({
-  origin: ["https://getdropflow.lovable.app", "https://lovable.dev"] || 'http://localhost:5173',
-  credentials: true,
-}));
+app.use(cors({ origin: "*" }));
 app.use(morgan('combined'));
 
 // Rate limiting
