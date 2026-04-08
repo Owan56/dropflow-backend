@@ -13,6 +13,7 @@ const webhookRoutes = require('./routes/webhooks');
 const alertsRoutes = require('./routes/alerts');
 const { authenticateToken } = require('./middleware/auth');
 const { setupSocketHandlers } = require('./socket/handlers');
+const { migrate } = require('./db/migrate');
 const app = express();
 const server = http.createServer(app);
 app.use(cors());
@@ -33,5 +34,14 @@ app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 app.use((err, req, res, next) => res.status(500).json({ error: err.message }));
 setupSocketHandlers(io);
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => console.log('Server running on port ' + PORT));
+async function start() {
+  try {
+    await migrate();
+    server.listen(PORT, () => console.log('Server running on port ' + PORT));
+  } catch (err) {
+    console.error('❌ Failed to run migrations, server will not start:', err);
+    process.exit(1);
+  }
+}
+start();
 module.exports = { app, server, io };
