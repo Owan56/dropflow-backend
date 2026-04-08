@@ -1,11 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
 const { Server } = require('socket.io');
-const rateLimit = require('express-rate-limit');
-
 const authRoutes = require('./routes/auth');
 const shopifyRoutes = require('./routes/shopify');
 const dashboardRoutes = require('./routes/dashboard');
@@ -14,24 +11,16 @@ const productsRoutes = require('./routes/products');
 const analyticsRoutes = require('./routes/analytics');
 const webhookRoutes = require('./routes/webhooks');
 const alertsRoutes = require('./routes/alerts');
-
 const { authenticateToken } = require('./middleware/auth');
 const { setupSocketHandlers } = require('./socket/handlers');
-
 const app = express();
 const server = http.createServer(app);
-
 app.use(cors());
-app.use(helmet());
-app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-
 const io = new Server(server, { cors: { origin: '*' } });
 app.set('io', io);
-
 app.get('/health', (req, res) => res.json({ status: 'ok', version: '1.0.0' }));
-
 app.use('/auth', authRoutes);
 app.use('/webhooks', webhookRoutes);
 app.use('/auth/shopify', shopifyRoutes);
@@ -40,13 +29,9 @@ app.use('/api/orders', authenticateToken, ordersRoutes);
 app.use('/api/products', authenticateToken, productsRoutes);
 app.use('/api/analytics', authenticateToken, analyticsRoutes);
 app.use('/api/alerts', authenticateToken, alertsRoutes);
-
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 app.use((err, req, res, next) => res.status(500).json({ error: err.message }));
-
 setupSocketHandlers(io);
-
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => console.log('Server running on port ' + PORT));
-
 module.exports = { app, server, io };
