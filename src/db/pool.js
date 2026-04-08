@@ -4,7 +4,9 @@ const { Pool } = require('pg');
 const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
 
 if (!connectionString) {
-  console.error('ERROR: No DATABASE_URL or POSTGRES_URL environment variable set');
+  throw new Error(
+    'Missing required environment variable: DATABASE_URL (or POSTGRES_URL) must be set to a valid PostgreSQL connection string.'
+  );
 }
 
 const pool = new Pool({
