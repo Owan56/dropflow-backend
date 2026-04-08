@@ -6,9 +6,34 @@ const { generateToken, authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Normalize incoming request body to canonical field names so the rest of
+// the code is agnostic to whatever naming convention the frontend uses.
+function normalizeFields(body) {
+  const email =
+    body.email ||
+    body.emailAddress ||
+    body.email_address ||
+    null;
+
+  const password =
+    body.password ||
+    body.pwd ||
+    body.pass ||
+    null;
+
+  const full_name =
+    body.full_name ||
+    body.fullName ||
+    (body.firstName && body.lastName ? `${body.firstName} ${body.lastName}` : null) ||
+    (body.prenom && body.nom ? `${body.prenom} ${body.nom}` : null) ||
+    null;
+
+  return { email, password, full_name };
+}
+
 // POST /auth/register
 router.post('/register', async (req, res) => {
-  const { email, password, full_name } = req.body;
+  const { email, password, full_name } = normalizeFields(req.body);
 
   if (!email || !password || !full_name) {
     return res.status(400).json({ error: 'Email, password and full name are required' });
@@ -49,7 +74,7 @@ router.post('/register', async (req, res) => {
 
 // POST /auth/login
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = normalizeFields(req.body);
 
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
