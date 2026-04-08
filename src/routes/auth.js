@@ -6,9 +6,22 @@ const { generateToken, authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Normalize common field name variations from different frontend implementations
+function normalizeFields(body) {
+  return {
+    email: body.email || body.Email || body.EMAIL,
+    password: body.password || body.Password || body.PASSWORD,
+    full_name: body.full_name || body.fullName || body.FullName || body.full_Name || body.name || body.Name,
+  };
+}
+
 // POST /auth/register
 router.post('/register', async (req, res) => {
-  const { email, password, full_name } = req.body;
+  console.log('Raw request body:', JSON.stringify(req.body, null, 2));
+  const normalized = normalizeFields(req.body);
+  console.log('Normalized fields:', normalized);
+
+  const { email, password, full_name } = normalized;
 
   if (!email || !password || !full_name) {
     return res.status(400).json({ error: 'Email, password and full name are required' });
