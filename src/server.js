@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
+const migrate = require('./db/migrate');
 const authRoutes = require('./routes/auth');
 const shopifyRoutes = require('./routes/shopify');
 const dashboardRoutes = require('./routes/dashboard');
@@ -33,5 +34,12 @@ app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 app.use((err, req, res, next) => res.status(500).json({ error: err.message }));
 setupSocketHandlers(io);
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => console.log('Server running on port ' + PORT));
+migrate()
+  .then(() => {
+    server.listen(PORT, () => console.log('Server running on port ' + PORT));
+  })
+  .catch((err) => {
+    console.error('❌ Failed to run migrations, server will not start:', err);
+    process.exit(1);
+  });
 module.exports = { app, server, io };
