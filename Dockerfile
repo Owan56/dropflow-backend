@@ -8,6 +8,7 @@ RUN npm ci --only=production
 
 # Copy source
 COPY src/ ./src/
+COPY public/ ./public/
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
