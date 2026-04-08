@@ -124,4 +124,12 @@ async function migrate() {
   }
 }
 
-migrate();
+// Export for programmatic use (e.g. called from server.js on startup).
+// When run directly as a script, execute and propagate the exit code.
+module.exports = migrate;
+
+if (require.main === module) {
+  migrate()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1));
+}
