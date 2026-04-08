@@ -124,4 +124,9 @@ async function migrate() {
   }
 }
 
-migrate();
+// Export for use in server startup; also support direct execution
+if (require.main === module) {
+  migrate().then(() => process.exit(0)).catch(() => process.exit(1));
+}
+
+module.exports = { migrate };
