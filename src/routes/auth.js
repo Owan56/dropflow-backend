@@ -8,6 +8,11 @@ const router = express.Router();
 
 // POST /auth/register
 router.post('/register', async (req, res) => {
+  console.log('Register request body:', req.body);
+  console.log('Email:', req.body.email);
+  console.log('Password:', req.body.password);
+  console.log('Full name:', req.body.full_name);
+
   const { email, password, full_name } = req.body;
 
   if (!email || !password || !full_name) {
